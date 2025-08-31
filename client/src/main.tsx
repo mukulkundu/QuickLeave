@@ -7,6 +7,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom"
+import { AuthProvider } from "./context/AuthContext";
 
 import PublicLayout from "./PublicLayout"
 import ProtectedLayout from "./ProtectedLayout"
@@ -20,6 +21,7 @@ import ApplyLeave from "./pages/Features/ApplyLeave"
 import LeaveHistory from "./pages/Features/LeaveHistory"
 import ManageRequests from "./pages/Features/ManageRequests"
 import Settings from "./pages/Features/Settings"
+import AuthCallback from "./pages/Auth/AuthCallback";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +31,7 @@ const router = createBrowserRouter(
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Route>
 
       {/* Protected layout */}
@@ -45,6 +48,8 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 )
