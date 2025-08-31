@@ -7,7 +7,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom"
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthProvider";
 
 import PublicLayout from "./PublicLayout"
 import ProtectedLayout from "./ProtectedLayout"
@@ -20,6 +20,7 @@ import Dashboard from "./pages/Features/Dashboard"
 import ApplyLeave from "./pages/Features/ApplyLeave"
 import LeaveHistory from "./pages/Features/LeaveHistory"
 import ManageRequests from "./pages/Features/ManageRequests"
+import ManageUsers from "./pages/Features/ManageUsers"
 import Settings from "./pages/Features/Settings"
 import AuthCallback from "./pages/Auth/AuthCallback";
 
@@ -29,18 +30,19 @@ const router = createBrowserRouter(
       {/* Public layout */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="auth/callback" element={<AuthCallback />} />
       </Route>
 
       {/* Protected layout */}
       <Route element={<ProtectedLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/apply" element={<ApplyLeave />} />
-        <Route path="/history" element={<LeaveHistory />} />
-        <Route path="/requests" element={<ManageRequests />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="apply" element={<ApplyLeave />} />
+        <Route path="history" element={<LeaveHistory />} />
+        <Route path="requests" element={<ManageRequests />} />
+        <Route path="users" element={<ManageUsers />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
     </>
   )
