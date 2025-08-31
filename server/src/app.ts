@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes";
 import adminRoutes from "./routes/admin.routes";
+import leaveRoutes from "./routes/leave.routes";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 // routes
 app.use("/users", userRoutes);
 app.use("/admin", adminRoutes);
+app.use("/leave", leaveRoutes);
 
 
 
