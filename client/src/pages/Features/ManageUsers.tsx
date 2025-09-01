@@ -4,6 +4,7 @@ import { useApi } from "../../ProtectedLayout"
 type Role = "member" | "manager" | "admin"
 
 interface User {
+  name: string | null
   email: string
   role: Role
 }
@@ -18,7 +19,6 @@ export default function ManageUsers() {
     const fetchUsers = async () => {
       try {
         const data = await callApi("/admin/users")
-        // ✅ fallback if backend doesn’t send users
         setUsers(Array.isArray(data?.users) ? data.users : [])
       } catch (err) {
         console.error("Failed to load users", err)
@@ -61,6 +61,7 @@ export default function ManageUsers() {
           <table className="w-full bg-white shadow rounded-lg">
             <thead>
               <tr className="bg-gray-100 text-left">
+                <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
                 <th className="p-3">Role</th>
                 <th className="p-3">Action</th>
@@ -69,6 +70,7 @@ export default function ManageUsers() {
             <tbody>
               {users.map((u) => (
                 <tr key={u.email} className="border-t">
+                  <td className="p-3">{u.name || "—"}</td>
                   <td className="p-3">{u.email}</td>
                   <td className="p-3 capitalize">{u.role}</td>
                   <td className="p-3">

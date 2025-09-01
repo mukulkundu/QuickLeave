@@ -9,7 +9,7 @@ interface Leave {
   end_date: string
   reason: string
   status: LeaveStatus
-  leave_type_name: string | null   // ✅ renamed to match backend
+  leave_type_name: string | null
 }
 
 export default function LeaveHistory() {
@@ -76,7 +76,7 @@ export default function LeaveHistory() {
               <tr className="bg-gray-100 text-left">
                 <th className="p-3">Dates</th>
                 <th className="p-3">Reason</th>
-                <th className="p-3">Type of Leave</th> {/* ✅ updated column */}
+                <th className="p-3">Type of Leave</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Action</th>
               </tr>
@@ -84,21 +84,13 @@ export default function LeaveHistory() {
             <tbody>
               {leaves.map((l) => (
                 <tr key={l.id} className="border-t">
-                  <td className="p-3">
-                    {l.start_date} → {l.end_date}
-                  </td>
+                  <td className="p-3">{l.start_date} → {l.end_date}</td>
                   <td className="p-3">{l.reason}</td>
-                  <td className="p-3">{l.leave_type_name ?? "—"}</td> {/* ✅ fixed */}
+                  <td className="p-3">{l.leave_type_name ?? "—"}</td>
                   <td className="p-3 capitalize">
-                    {l.status === "approved" && (
-                      <span className="text-green-600">● Approved</span>
-                    )}
-                    {l.status === "pending" && (
-                      <span className="text-yellow-600">● Pending</span>
-                    )}
-                    {l.status === "rejected" && (
-                      <span className="text-red-600">● Rejected</span>
-                    )}
+                    {l.status === "approved" && <span className="text-green-600">● Approved</span>}
+                    {l.status === "pending" && <span className="text-yellow-600">● Pending</span>}
+                    {l.status === "rejected" && <span className="text-red-600">● Rejected</span>}
                   </td>
                   <td className="p-3">
                     {canCancel(l) && (

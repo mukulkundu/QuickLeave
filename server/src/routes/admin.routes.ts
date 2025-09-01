@@ -13,7 +13,7 @@ router.get("/users", requireAuth, requireRole(["admin"]), async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("users") // 👈 make sure your table is named `users` or `profiles`
-      .select("id, email, role, created_at");
+      .select("id, email, role, name, created_at");
 
     if (error) throw error;
 

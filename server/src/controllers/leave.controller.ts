@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { supabase } from "../config/supabaseClient";
+import { sendLeaveStatusEmail } from "../services/email.service";
 
 // --------------------------------------------------
 // Member applies for leave
@@ -32,10 +33,12 @@ export const applyLeave = async (req: Request, res: Response) => {
     status: "pending",
   });
 
-  if (error)
+  if (error) {
+    console.error("applyLeave error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
 
   res.json({ success: true });
 };
@@ -57,10 +60,12 @@ export const getUserLeaves = async (req: Request, res: Response) => {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  if (error)
+  if (error) {
+    console.error("getUserLeaves error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
 
   const formatted =
     data?.map((r: any) => ({
@@ -70,7 +75,7 @@ export const getUserLeaves = async (req: Request, res: Response) => {
       reason: r.reason,
       status: r.status,
       created_at: r.created_at,
-      leave_type_name: r.leave_types?.name || null, // ✅ renamed consistently
+      leave_type_name: r.leave_types?.name || null,
     })) || [];
 
   res.json({ leaves: formatted });
@@ -85,27 +90,36 @@ export const getAllLeaveRequests = async (_req: Request, res: Response) => {
     .select(
       `
       id, start_date, end_date, reason, status, created_at,
-      users (email), leave_types (name)
+      users:user_id (name, email),
+      leave_types:leave_type_id (name)
     `
     )
     .order("created_at", { ascending: false });
 
-  if (error)
+  if (error) {
+    console.error("getAllLeaveRequests error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
 
   const formatted =
-    data?.map((r: any) => ({
-      id: r.id,
-      start_date: r.start_date,
-      end_date: r.end_date,
-      reason: r.reason,
-      status: r.status,
-      created_at: r.created_at,
-      user_email: r.users?.email || null,
-      leave_type_name: r.leave_types?.name || null, // ✅ renamed consistently
-    })) || [];
+    data?.map((r: any) => {
+      const user = Array.isArray(r.users) ? r.users[0] : r.users;
+      const leaveType = Array.isArray(r.leave_types) ? r.leave_types[0] : r.leave_types;
+      
+      return {
+        id: r.id,
+        start_date: r.start_date,
+        end_date: r.end_date,
+        reason: r.reason,
+        status: r.status,
+        created_at: r.created_at,
+        user_name: user?.name ?? null,   // ✅ added
+        user_email: user?.email ?? null, // ✅ still there
+        leave_type_name: leaveType?.name ?? null,
+      };
+    }) || [];
 
   res.json({ requests: formatted });
 };
@@ -121,15 +135,43 @@ export const updateLeaveStatus = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Invalid status" });
   }
 
-  const { error } = await supabase
+  // ✅ Update DB and fetch related user + leave type
+  const { data, error } = await supabase
     .from("leave_requests")
     .update({ status })
-    .eq("id", id);
+    .eq("id", id)
+    .select(
+      `
+      id, start_date, end_date, reason, status,
+      users:user_id (name, email),
+      leave_types:leave_type_id (name)
+    `
+    )
+    .single();
 
-  if (error)
+  if (error) {
+    console.error("updateLeaveStatus error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
+
+  const user = Array.isArray(data?.users) ? data.users[0] : data?.users;
+  const leaveType = Array.isArray(data?.leave_types) ? data.leave_types[0] : data?.leave_types;
+
+  // ✅ Send notification email
+  if (user?.email) {
+    sendLeaveStatusEmail({
+      email: user.email,
+      name: user?.name || undefined,
+      leaveType: leaveType?.name || "Leave",
+      startDate: data.start_date,
+      endDate: data.end_date,
+      status,
+    }).catch((err) => {
+      console.error("Email send error:", err.message);
+    });
+  }
 
   res.json({ success: true });
 };
@@ -143,10 +185,12 @@ export const getLeaveTypes = async (_req: Request, res: Response) => {
     .select("id, name")
     .order("name", { ascending: true });
 
-  if (error)
+  if (error) {
+    console.error("getLeaveTypes error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
 
   res.json(data || []);
 };
@@ -163,10 +207,12 @@ export const addLeaveType = async (req: Request, res: Response) => {
 
   const { error } = await supabase.from("leave_types").insert({ name });
 
-  if (error)
+  if (error) {
+    console.error("addLeaveType error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
 
   res.json({ success: true });
 };
@@ -183,10 +229,12 @@ export const deleteLeaveType = async (req: Request, res: Response) => {
     .select("*", { count: "exact", head: true })
     .eq("leave_type_id", id);
 
-  if (checkError)
+  if (checkError) {
+    console.error("deleteLeaveType check error:", checkError);
     return res
       .status(500)
       .json({ error: checkError.message, details: checkError.details });
+  }
 
   if (count && count > 0) {
     return res
@@ -196,10 +244,12 @@ export const deleteLeaveType = async (req: Request, res: Response) => {
 
   const { error } = await supabase.from("leave_types").delete().eq("id", id);
 
-  if (error)
+  if (error) {
+    console.error("deleteLeaveType error:", error);
     return res
       .status(500)
       .json({ error: error.message, details: error.details });
+  }
 
   res.json({ success: true });
 };

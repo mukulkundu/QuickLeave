@@ -5,12 +5,13 @@ type LeaveStatus = "pending" | "approved" | "rejected"
 
 interface LeaveRequest {
   id: string
+  user_name: string | null
   user_email: string | null
   start_date: string
   end_date: string
   reason: string
   status: LeaveStatus
-  leave_type_name: string | null   // ✅ renamed to match backend
+  leave_type_name: string | null
 }
 
 export default function ManageRequests() {
@@ -64,10 +65,11 @@ export default function ManageRequests() {
           <table className="w-full bg-white shadow rounded-lg">
             <thead>
               <tr className="bg-gray-100 text-left">
-                <th className="p-3">Employee</th>
+                <th className="p-3">Employee Name</th>
+                <th className="p-3">Email</th>
                 <th className="p-3">Dates</th>
                 <th className="p-3">Reason</th>
-                <th className="p-3">Type of Leave</th> {/* ✅ updated header */}
+                <th className="p-3">Type of Leave</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Action</th>
               </tr>
@@ -75,12 +77,13 @@ export default function ManageRequests() {
             <tbody>
               {pendingRequests.map((r) => (
                 <tr key={r.id} className="border-t">
+                  <td className="p-3">{r.user_name ?? "—"}</td>
                   <td className="p-3">{r.user_email ?? "—"}</td>
                   <td className="p-3">
                     {r.start_date} → {r.end_date}
                   </td>
                   <td className="p-3">{r.reason}</td>
-                  <td className="p-3">{r.leave_type_name ?? "—"}</td> {/* ✅ fixed */}
+                  <td className="p-3">{r.leave_type_name ?? "—"}</td>
                   <td className="p-3 capitalize">
                     <span className="text-yellow-600">● Pending</span>
                   </td>

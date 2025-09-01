@@ -17,7 +17,7 @@ router.get("/me", requireAuth, async (req, res) => {
     // Try to fetch from users table
     const { data, error } = await supabase
       .from("users")
-      .select("role")
+      .select("role, name")
       .eq("id", user.id)
       .single();
 
@@ -25,7 +25,13 @@ router.get("/me", requireAuth, async (req, res) => {
       return res.status(500).json({ error: error.message });
     }
 
-    // If no row found → insert default role
+    // Extract name from Google metadata
+    const googleName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      null;
+
+    // If no row found → insert default role + name
     if (!data) {
       const { data: newUser, error: insertError } = await supabase
         .from("users")
@@ -33,8 +39,9 @@ router.get("/me", requireAuth, async (req, res) => {
           id: user.id,
           email: user.email,
           role: "member", // default role
+          name: googleName,
         })
-        .select("role")
+        .select("role, name")
         .single();
 
       if (insertError) {
@@ -45,7 +52,16 @@ router.get("/me", requireAuth, async (req, res) => {
         id: user.id,
         email: user.email,
         role: newUser.role,
+        name: newUser.name,
       });
+    }
+
+    // If row exists but missing name, update it
+    if (!data.name && googleName) {
+      await supabase
+        .from("users")
+        .update({ name: googleName })
+        .eq("id", user.id);
     }
 
     // Existing user
@@ -53,6 +69,7 @@ router.get("/me", requireAuth, async (req, res) => {
       id: user.id,
       email: user.email,
       role: data.role,
+      name: data.name || googleName, // fallback if missing
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

@@ -20,6 +20,13 @@ export default function Dashboard() {
   const [approved, setApproved] = useState(0)
   const [total, setTotal] = useState(0)
 
+  // Get the display name
+  const displayName =
+    session?.user?.user_metadata?.full_name ||
+    session?.user?.user_metadata?.name ||
+    session?.user?.email?.split("@")[0] || // fallback
+    "User"
+
   useEffect(() => {
     const fetchLeaves = async () => {
       try {
@@ -50,7 +57,7 @@ export default function Dashboard() {
       <div className="bg-white rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h1>
         <p className="text-gray-600">
-          Welcome back, {session?.user?.email || "User"}!
+          Welcome back, {displayName}!
         </p>
       </div>
 
