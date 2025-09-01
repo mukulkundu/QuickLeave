@@ -23,6 +23,7 @@ import ManageRequests from "./pages/Features/ManageRequests"
 import ManageUsers from "./pages/Features/ManageUsers"
 import Settings from "./pages/Features/Settings"
 import AuthCallback from "./pages/Auth/AuthCallback";
+import ManageLeaveTypes from "./pages/Features/ManageLeaveTypes";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -42,6 +43,7 @@ const router = createBrowserRouter(
         <Route path="history" element={<LeaveHistory />} />
         <Route path="requests" element={<ManageRequests />} />
         <Route path="users" element={<ManageUsers />} />
+        <Route path="leave-types" element={<ManageLeaveTypes />} />
         <Route path="settings" element={<Settings />} />
       </Route>
     </>

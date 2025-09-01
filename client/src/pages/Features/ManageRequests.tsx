@@ -10,7 +10,7 @@ interface LeaveRequest {
   end_date: string
   reason: string
   status: LeaveStatus
-  leave_type?: string | null
+  leave_type_name: string | null   // ✅ renamed to match backend
 }
 
 export default function ManageRequests() {
@@ -40,7 +40,6 @@ export default function ManageRequests() {
         method: "PATCH",
         body: JSON.stringify({ status: newStatus }),
       })
-      // update local state
       setRequests((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       )
@@ -50,13 +49,8 @@ export default function ManageRequests() {
     }
   }
 
-  if (loading) {
-    return <div className="p-6">Loading leave requests...</div>
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-600">{error}</div>
-  }
+  if (loading) return <div className="p-6">Loading leave requests...</div>
+  if (error) return <div className="p-6 text-red-600">{error}</div>
 
   const pendingRequests = requests.filter((r) => r.status === "pending")
 
@@ -73,7 +67,7 @@ export default function ManageRequests() {
                 <th className="p-3">Employee</th>
                 <th className="p-3">Dates</th>
                 <th className="p-3">Reason</th>
-                <th className="p-3">Leave Type</th>
+                <th className="p-3">Type of Leave</th> {/* ✅ updated header */}
                 <th className="p-3">Status</th>
                 <th className="p-3">Action</th>
               </tr>
@@ -86,7 +80,7 @@ export default function ManageRequests() {
                     {r.start_date} → {r.end_date}
                   </td>
                   <td className="p-3">{r.reason}</td>
-                  <td className="p-3">{r.leave_type ?? "—"}</td>
+                  <td className="p-3">{r.leave_type_name ?? "—"}</td> {/* ✅ fixed */}
                   <td className="p-3 capitalize">
                     <span className="text-yellow-600">● Pending</span>
                   </td>

@@ -9,6 +9,7 @@ interface Leave {
   end_date: string
   reason: string
   status: LeaveStatus
+  leave_type_name: string | null   // ✅ renamed to match backend
 }
 
 export default function LeaveHistory() {
@@ -31,7 +32,29 @@ export default function LeaveHistory() {
     }
     fetchLeaves()
   }, [callApi])
-  
+
+  const cancelLeave = async (id: string) => {
+    try {
+      await callApi(`/leave/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "rejected" }),
+      })
+      setLeaves((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status: "rejected" } : l))
+      )
+    } catch (err) {
+      console.error("Failed to cancel leave", err)
+      setError("Could not cancel leave.")
+    }
+  }
+
+  const canCancel = (leave: Leave) => {
+    if (leave.status !== "approved") return false
+    const start = new Date(leave.start_date)
+    const today = new Date()
+    const diffDays = (start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    return diffDays >= 1
+  }
 
   if (loading) {
     return <div className="p-6">Loading history...</div>
@@ -53,7 +76,9 @@ export default function LeaveHistory() {
               <tr className="bg-gray-100 text-left">
                 <th className="p-3">Dates</th>
                 <th className="p-3">Reason</th>
+                <th className="p-3">Type of Leave</th> {/* ✅ updated column */}
                 <th className="p-3">Status</th>
+                <th className="p-3">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -63,6 +88,7 @@ export default function LeaveHistory() {
                     {l.start_date} → {l.end_date}
                   </td>
                   <td className="p-3">{l.reason}</td>
+                  <td className="p-3">{l.leave_type_name ?? "—"}</td> {/* ✅ fixed */}
                   <td className="p-3 capitalize">
                     {l.status === "approved" && (
                       <span className="text-green-600">● Approved</span>
@@ -72,6 +98,16 @@ export default function LeaveHistory() {
                     )}
                     {l.status === "rejected" && (
                       <span className="text-red-600">● Rejected</span>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {canCancel(l) && (
+                      <button
+                        onClick={() => cancelLeave(l.id)}
+                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                      >
+                        Cancel Leave
+                      </button>
                     )}
                   </td>
                 </tr>

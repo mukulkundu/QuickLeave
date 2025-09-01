@@ -50,6 +50,15 @@ export default function Sidebar({ role }: { role: Role }) {
           👥 Manage Users
         </Link>
 
+        <Link
+          to={role === "admin" ? "/leave-types" : "#"}
+          className={`${linkBase} ${
+            role === "admin" ? activeStyle : disabledStyle
+          }`}
+        >
+          Manage Leave Types
+        </Link>
+
         <Link to="/settings" className={`${linkBase} ${activeStyle}`}>
           ⚙️ Settings
         </Link>
