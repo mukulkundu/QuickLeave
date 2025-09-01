@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes";
 import adminRoutes from "./routes/admin.routes";
 import leaveRoutes from "./routes/leave.routes";
+import calendarRoutes from './routes/calender.routes';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 app.use("/users", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/leave", leaveRoutes);
+app.use("/calendar", calendarRoutes);
 
 
 

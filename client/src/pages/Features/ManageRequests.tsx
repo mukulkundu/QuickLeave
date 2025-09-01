@@ -41,9 +41,16 @@ export default function ManageRequests() {
         method: "PATCH",
         body: JSON.stringify({ status: newStatus }),
       })
+
       setRequests((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       )
+
+      if (newStatus === "approved") {
+        alert("✅ Leave approved. Added to Google Calendar if connected.")
+      } else {
+        alert("❌ Leave rejected.")
+      }
     } catch (err) {
       console.error("Failed to update status", err)
       setError("Could not update request status.")

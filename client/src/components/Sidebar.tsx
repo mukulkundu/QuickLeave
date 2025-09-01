@@ -59,9 +59,6 @@ export default function Sidebar({ role }: { role: Role }) {
           Manage Leave Types
         </Link>
 
-        <Link to="/settings" className={`${linkBase} ${activeStyle}`}>
-          ⚙️ Settings
-        </Link>
       </nav>
     </aside>
   )

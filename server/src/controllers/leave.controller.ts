@@ -1,19 +1,23 @@
 import { Request, Response } from "express";
 import { supabase } from "../config/supabaseClient";
 import { sendLeaveStatusEmail } from "../services/email.service";
+import {
+  addLeaveToCalendar,
+  isCalendarConnected,
+  removeLeaveFromCalendar,
+} from "../services/calendar.service";
 
 // --------------------------------------------------
 // Member applies for leave
 // --------------------------------------------------
 export const applyLeave = async (req: Request, res: Response) => {
-  const user = (req as any).user; // injected by requireAuth
+  const user = (req as any).user;
   const { start_date, end_date, reason, leave_type_id } = req.body;
 
   if (!start_date || !end_date || !reason || !leave_type_id) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  // ✅ Ensure leave_type_id exists
   const { data: lt, error: ltError } = await supabase
     .from("leave_types")
     .select("id")
@@ -29,15 +33,13 @@ export const applyLeave = async (req: Request, res: Response) => {
     start_date,
     end_date,
     reason,
-    leave_type_id, // only FK
+    leave_type_id,
     status: "pending",
   });
 
   if (error) {
     console.error("applyLeave error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   res.json({ success: true });
@@ -62,9 +64,7 @@ export const getUserLeaves = async (req: Request, res: Response) => {
 
   if (error) {
     console.error("getUserLeaves error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   const formatted =
@@ -75,7 +75,9 @@ export const getUserLeaves = async (req: Request, res: Response) => {
       reason: r.reason,
       status: r.status,
       created_at: r.created_at,
-      leave_type_name: r.leave_types?.name || null,
+      leave_type_name: Array.isArray(r.leave_types)
+        ? r.leave_types[0]?.name
+        : r.leave_types?.name,
     })) || [];
 
   res.json({ leaves: formatted });
@@ -98,16 +100,16 @@ export const getAllLeaveRequests = async (_req: Request, res: Response) => {
 
   if (error) {
     console.error("getAllLeaveRequests error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   const formatted =
     data?.map((r: any) => {
       const user = Array.isArray(r.users) ? r.users[0] : r.users;
-      const leaveType = Array.isArray(r.leave_types) ? r.leave_types[0] : r.leave_types;
-      
+      const leaveType = Array.isArray(r.leave_types)
+        ? r.leave_types[0]
+        : r.leave_types;
+
       return {
         id: r.id,
         start_date: r.start_date,
@@ -115,8 +117,8 @@ export const getAllLeaveRequests = async (_req: Request, res: Response) => {
         reason: r.reason,
         status: r.status,
         created_at: r.created_at,
-        user_name: user?.name ?? null,   // ✅ added
-        user_email: user?.email ?? null, // ✅ still there
+        user_name: user?.name ?? null,
+        user_email: user?.email ?? null,
         leave_type_name: leaveType?.name ?? null,
       };
     }) || [];
@@ -135,14 +137,13 @@ export const updateLeaveStatus = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Invalid status" });
   }
 
-  // ✅ Update DB and fetch related user + leave type
   const { data, error } = await supabase
     .from("leave_requests")
     .update({ status })
     .eq("id", id)
     .select(
       `
-      id, start_date, end_date, reason, status,
+      id, start_date, end_date, reason, status, user_id,
       users:user_id (name, email),
       leave_types:leave_type_id (name)
     `
@@ -151,15 +152,14 @@ export const updateLeaveStatus = async (req: Request, res: Response) => {
 
   if (error) {
     console.error("updateLeaveStatus error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   const user = Array.isArray(data?.users) ? data.users[0] : data?.users;
-  const leaveType = Array.isArray(data?.leave_types) ? data.leave_types[0] : data?.leave_types;
+  const leaveType = Array.isArray(data?.leave_types)
+    ? data.leave_types[0]
+    : data?.leave_types;
 
-  // ✅ Send notification email
   if (user?.email) {
     sendLeaveStatusEmail({
       email: user.email,
@@ -173,11 +173,96 @@ export const updateLeaveStatus = async (req: Request, res: Response) => {
     });
   }
 
+  try {
+    const connected = await isCalendarConnected(data.user_id);
+    if (connected) {
+      if (status === "approved") {
+        await addLeaveToCalendar({
+          userId: data.user_id,
+          leaveRequestId: data.id,
+          leaveType: leaveType?.name || "Leave",
+          startDate: data.start_date,
+          endDate: data.end_date,
+          reason: data.reason,
+          userEmail: user?.email,
+          userName: user?.name,
+        });
+      } else if (status === "rejected") {
+        await removeLeaveFromCalendar({
+          userId: data.user_id,
+          leaveRequestId: data.id,
+        });
+      }
+    } else {
+      console.log(
+        `📅 User ${data.user_id} has not connected Google Calendar. Skipping...`
+      );
+    }
+  } catch (err: any) {
+    console.error("Calendar sync error:", err.message);
+  }
+
   res.json({ success: true });
 };
 
 // --------------------------------------------------
-// Fetch all leave types (for dropdown options)
+// Delete leave request (user or admin)
+// --------------------------------------------------
+export const deleteLeave = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = (req as any).user;
+
+  try {
+    const { data: leave, error: fetchError } = await supabase
+      .from("leave_requests")
+      .select("id, user_id")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !leave) {
+      return res.status(404).json({ error: "Leave request not found" });
+    }
+
+    if (
+      leave.user_id !== user.id &&
+      !["admin", "manager"].includes(user.role)
+    ) {
+      return res.status(403).json({ error: "Not authorized to delete this leave" });
+    }
+
+    // ✅ Remove from calendar BEFORE deleting from DB
+    try {
+      const connected = await isCalendarConnected(leave.user_id);
+      if (connected) {
+        await removeLeaveFromCalendar({
+          userId: leave.user_id,
+          leaveRequestId: leave.id,
+        });
+      }
+    } catch (err: any) {
+      console.error("Calendar remove error:", err.message);
+    }
+
+    // ✅ Now delete from DB
+    const { error: deleteError } = await supabase
+      .from("leave_requests")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      console.error("deleteLeave DB error:", deleteError);
+      return res.status(500).json({ error: deleteError.message });
+    }
+
+    res.json({ success: true });
+  } catch (err: any) {
+    console.error("deleteLeave error:", err.message);
+    res.status(500).json({ error: "Failed to delete leave request" });
+  }
+};
+
+// --------------------------------------------------
+// Fetch all leave types
 // --------------------------------------------------
 export const getLeaveTypes = async (_req: Request, res: Response) => {
   const { data, error } = await supabase
@@ -187,9 +272,7 @@ export const getLeaveTypes = async (_req: Request, res: Response) => {
 
   if (error) {
     console.error("getLeaveTypes error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   res.json(data || []);
@@ -209,9 +292,7 @@ export const addLeaveType = async (req: Request, res: Response) => {
 
   if (error) {
     console.error("addLeaveType error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   res.json({ success: true });
@@ -223,7 +304,6 @@ export const addLeaveType = async (req: Request, res: Response) => {
 export const deleteLeaveType = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  // ✅ Prevent deleting if linked to leave_requests
   const { count, error: checkError } = await supabase
     .from("leave_requests")
     .select("*", { count: "exact", head: true })
@@ -246,9 +326,7 @@ export const deleteLeaveType = async (req: Request, res: Response) => {
 
   if (error) {
     console.error("deleteLeaveType error:", error);
-    return res
-      .status(500)
-      .json({ error: error.message, details: error.details });
+    return res.status(500).json({ error: error.message, details: error.details });
   }
 
   res.json({ success: true });

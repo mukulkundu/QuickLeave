@@ -17,6 +17,7 @@ export default function LeaveHistory() {
   const [leaves, setLeaves] = useState<Leave[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchLeaves = async () => {
@@ -34,6 +35,7 @@ export default function LeaveHistory() {
   }, [callApi])
 
   const cancelLeave = async (id: string) => {
+    setCancellingId(id)
     try {
       await callApi(`/leave/${id}/status`, {
         method: "PATCH",
@@ -45,6 +47,8 @@ export default function LeaveHistory() {
     } catch (err) {
       console.error("Failed to cancel leave", err)
       setError("Could not cancel leave.")
+    } finally {
+      setCancellingId(null)
     }
   }
 
@@ -96,9 +100,14 @@ export default function LeaveHistory() {
                     {canCancel(l) && (
                       <button
                         onClick={() => cancelLeave(l.id)}
-                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                        disabled={cancellingId === l.id}
+                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       >
-                        Cancel Leave
+                        {cancellingId === l.id ? (
+                          <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                        ) : (
+                          "Cancel Leave"
+                        )}
                       </button>
                     )}
                   </td>
