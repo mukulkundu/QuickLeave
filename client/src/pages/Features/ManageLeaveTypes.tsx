@@ -56,7 +56,7 @@ export default function ManageLeaveTypes() {
       fetchLeaveTypes()
     } catch (err) {
       console.error("Failed to delete leave type", err)
-      setError("Could not delete leave type")
+      setError("Could not delete leave type beacuse it is in use")
     }
   }
 

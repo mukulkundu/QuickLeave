@@ -31,13 +31,13 @@ export async function addLeaveToCalendar(data: CalendarEventData): Promise<void>
       .single();
 
     if (error || !userTokens) {
-      console.log(`📅 No calendar tokens for user ${data.userId}, skipping calendar event`);
+      // console.log(`📅 No calendar tokens for user ${data.userId}, skipping calendar event`);
       return;
     }
 
     // Check expiry and refresh if needed
     if (userTokens.expiry_date && Date.now() >= userTokens.expiry_date) {
-      console.log("⚠️ Access token expired, refreshing...");
+      // console.log("⚠️ Access token expired, refreshing...");
       await refreshUserTokens(data.userId);
     }
 
@@ -65,7 +65,7 @@ export async function addLeaveToCalendar(data: CalendarEventData): Promise<void>
     });
 
     const googleEventId = response.data.id;
-    console.log(`📅 Calendar event created: ${response.data.htmlLink}`);
+    // console.log(`📅 Calendar event created: ${response.data.htmlLink}`);
 
     if (data.leaveRequestId) {
       // update leave_requests
@@ -86,7 +86,7 @@ export async function addLeaveToCalendar(data: CalendarEventData): Promise<void>
     console.error('❌ Error adding to calendar:', error.message);
 
     if (error.code === 401 || error.message.includes("Invalid Credentials")) {
-      console.log("🔄 Refreshing tokens due to 401...");
+      // console.log("🔄 Refreshing tokens due to 401...");
       await refreshUserTokens(data.userId);
     }
   }
@@ -106,7 +106,7 @@ export async function updateLeaveInCalendar(data: CalendarEventData & { googleEv
     if (!token) return;
 
     if (token.expiry_date && Date.now() >= token.expiry_date) {
-      console.log("⚠️ Access token expired, refreshing...");
+      // console.log("⚠️ Access token expired, refreshing...");
       await refreshUserTokens(data.userId);
     }
 
@@ -126,7 +126,7 @@ export async function updateLeaveInCalendar(data: CalendarEventData & { googleEv
       requestBody: event,
     });
 
-    console.log(`📅 Calendar event updated: ${data.googleEventId}`);
+    // console.log(`📅 Calendar event updated: ${data.googleEventId}`);
   } catch (err: any) {
     console.error('❌ Error updating calendar event:', err.message);
   }
@@ -146,7 +146,7 @@ export async function deleteLeaveFromCalendar(userId: string, googleEventId: str
     if (!token) return;
 
     if (token.expiry_date && Date.now() >= token.expiry_date) {
-      console.log("⚠️ Access token expired, refreshing...");
+      // console.log("⚠️ Access token expired, refreshing...");
       await refreshUserTokens(userId);
     }
 
@@ -158,7 +158,7 @@ export async function deleteLeaveFromCalendar(userId: string, googleEventId: str
       eventId: googleEventId,
     });
 
-    console.log(`🗑️ Calendar event deleted: ${googleEventId}`);
+    // console.log(`🗑️ Calendar event deleted: ${googleEventId}`);
   } catch (err: any) {
     console.error('❌ Error deleting calendar event:', err.message);
   }
@@ -197,7 +197,7 @@ async function refreshUserTokens(userId: string): Promise<void> {
       })
       .eq('user_id', userId);
 
-    console.log('🔄 Tokens refreshed successfully');
+    // console.log('🔄 Tokens refreshed successfully');
   } catch (error) {
     console.error('❌ Error refreshing tokens:', error);
   }
@@ -232,7 +232,7 @@ export async function handleCalendarCallback(code: string, userId: string): Prom
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
 
-    console.log(`📅 Calendar tokens stored for user ${userId}`);
+    // console.log(`📅 Calendar tokens stored for user ${userId}`);
   } catch (error) {
     console.error('❌ Error handling calendar callback:', error);
     throw error;
@@ -278,7 +278,7 @@ export async function removeLeaveFromCalendar({
       .maybeSingle();
 
     if (error || !data?.google_event_id) {
-      console.log(`⚠️ No Google event found for leave ${leaveRequestId}`);
+      // console.log(`⚠️ No Google event found for leave ${leaveRequestId}`);
       return;
     }
 
@@ -296,7 +296,7 @@ export async function removeLeaveFromCalendar({
       .update({ google_event_id: null })
       .eq('id', leaveRequestId);
 
-    console.log(`🗑️ Removed Google event for leave ${leaveRequestId}`);
+    // console.log(`🗑️ Removed Google event for leave ${leaveRequestId}`);
   } catch (err: any) {
     console.error("❌ Error removing leave from calendar:", err.message);
   }
