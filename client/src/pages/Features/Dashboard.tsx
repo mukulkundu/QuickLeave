@@ -124,7 +124,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Welcome Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -138,7 +138,7 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Pending Leaves */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-4">
             <div className="p-2 bg-orange-100 rounded-lg">
               <Clock className="h-6 w-6 text-orange-600" />
@@ -156,7 +156,7 @@ export default function Dashboard() {
         </div>
 
         {/* Approved Leaves */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-4">
             <div className="p-2 bg-green-100 rounded-lg">
               <CheckCircle className="h-6 w-6 text-green-600" />
@@ -174,7 +174,7 @@ export default function Dashboard() {
         </div>
 
         {/* Total Leaves */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-4">
             <div className="p-2 bg-blue-100 rounded-lg">
               <FileText className="h-6 w-6 text-blue-600" />
@@ -193,7 +193,7 @@ export default function Dashboard() {
       </div>
 
       {/* Calendar Integration Card */}
-      <div className="rounded-lg border bg-white shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Calendar className="h-5 w-5 text-gray-600" />
@@ -258,20 +258,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="flex flex-wrap gap-3">
-          <button className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
-            <FileText className="w-4 h-4 mr-2" />
-            Apply for Leave
-          </button>
-          <button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-            <Clock className="w-4 h-4 mr-2" />
-            View Leave History
-          </button>
-        </div>
-      </div>
+      
     </div>
   )
 }

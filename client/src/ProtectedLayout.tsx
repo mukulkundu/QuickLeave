@@ -20,6 +20,7 @@ export default function ProtectedLayout() {
   const [userRole, setUserRole] = useState<Role>("member");
   const [loadingRole, setLoadingRole] = useState(true);
   const [showOverlay, setShowOverlay] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -75,9 +76,16 @@ export default function ProtectedLayout() {
   return (
     <ApiContext.Provider value={{ callApi }}>
       <div className="flex h-screen bg-gray-100 overflow-hidden">
-        <Sidebar role={userRole} />
+        <Sidebar 
+          role={userRole} 
+          isMobileMenuOpen={isMobileMenuOpen}
+          onMenuClose={() => setIsMobileMenuOpen(false)}
+        />
         <div className="flex-1 flex flex-col min-w-0">
-          <Navbar />
+          <Navbar 
+            onMenuToggle={() => setIsMobileMenuOpen(prev => !prev)}
+            isMobileMenuOpen={isMobileMenuOpen}
+          />
           <main className="flex-1 overflow-y-auto p-6">
             <Outlet />
           </main>
