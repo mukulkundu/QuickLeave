@@ -27,7 +27,7 @@ export default function ProtectedLayout() {
 
     const fetchRole = async () => {
       try {
-        const res = await fetch("http://localhost:5000/users/me", {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}/users/me`, {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
         const data = await res.json();
@@ -59,7 +59,7 @@ export default function ProtectedLayout() {
 
   // ✅ API helper
   const callApi = async (url: string, options: RequestInit = {}) => {
-    const res = await fetch(`http://localhost:5000${url}`, {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URI}${url}`, {
       ...options,
       headers: {
         ...options.headers,
