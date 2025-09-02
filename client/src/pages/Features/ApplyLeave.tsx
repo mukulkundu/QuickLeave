@@ -82,7 +82,7 @@ export default function ApplyLeave() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Toast */}
       <div className="fixed top-4 inset-x-0 flex justify-center pointer-events-none z-50">
         {toast && (
@@ -106,10 +106,10 @@ export default function ApplyLeave() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 lg:gap-6 transform-gpu">
           {/* Main Form */}
           <div className="xl:col-span-3">
-            <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-sm transform-gpu" style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}>
               <div className="p-4 sm:p-6 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900">Leave Request Details</h3>
                 <p className="text-sm text-gray-500 mt-1">Fill in the details for your leave request</p>
@@ -159,7 +159,7 @@ export default function ApplyLeave() {
                   <select
                     value={leaveTypeId}
                     onChange={(e) => setLeaveTypeId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="cursor-pointer w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   >
                     <option value="">Select leave type</option>
@@ -192,7 +192,7 @@ export default function ApplyLeave() {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="cursor-pointer inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     {isSubmitting ? (
                       <>

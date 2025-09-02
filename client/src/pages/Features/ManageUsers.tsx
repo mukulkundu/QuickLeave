@@ -259,7 +259,7 @@ export default function ManageUsers() {
                           <button
                             onClick={() => updateRole(u.email, "manager")}
                             disabled={updatingEmail === u.email}
-                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             {updatingEmail === u.email && targetRole === "manager" ? (
                               <>
@@ -278,7 +278,7 @@ export default function ManageUsers() {
                           <button
                             onClick={() => updateRole(u.email, "member")}
                             disabled={updatingEmail === u.email}
-                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             {updatingEmail === u.email && targetRole === "member" ? (
                               <>

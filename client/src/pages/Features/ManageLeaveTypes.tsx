@@ -143,7 +143,7 @@ export default function ManageLeaveTypes() {
               <button
                 onClick={handleAdd}
                 disabled={isAdding || !newType.trim()}
-                className="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="cursor-pointer inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isAdding ? (
                   <>
@@ -197,7 +197,7 @@ export default function ManageLeaveTypes() {
                   <button
                     onClick={() => handleDelete(t.id)}
                     disabled={deletingId === t.id}
-                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {deletingId === t.id ? (
                       <>
