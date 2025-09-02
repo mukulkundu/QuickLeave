@@ -52,7 +52,7 @@ export default function ProtectedLayout() {
     );
   }
 
-  // 🚪 No session → redirect to login, and preserve where user was trying to go
+  // 🚪 No session → redirect to landing page, and preserve where user was trying to go
   if (!session) {
     return <Navigate to="/" state={{ from: location }} replace />;
   }

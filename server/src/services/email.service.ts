@@ -27,7 +27,7 @@ export async function sendLeaveStatusEmail(data: LeaveEmailData) {
   const text = isCancellation
     ? `Hi ${data.name || "Employee"},
 
-Your leave is cancelled successfully.
+Your leave is cancelled.
 
 Regards,
 Leave Management System`

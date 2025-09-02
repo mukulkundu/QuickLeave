@@ -16,6 +16,15 @@ app.get("/", (req, res) => {
   res.send("QuickLeave API running 🚀");
 });
 
+// Health check endpoint for monitoring
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // routes
 app.use("/users", userRoutes);
 app.use("/admin", adminRoutes);

@@ -7,7 +7,9 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "start": "tsx src/index.ts",
+    "build": "echo 'No build step required for tsx'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.56.1",

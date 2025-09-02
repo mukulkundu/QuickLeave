@@ -5,9 +5,14 @@ export default function PublicLayout() {
   const { session } = useAuth()
   const location = useLocation()
 
-  // If user is already authenticated and trying to access login/signup, redirect to dashboard
-  // But allow auth callback to proceed
+  // If user is already authenticated and trying to access landing page, redirect to dashboard
+  // But allow auth callback to proceed and preserve original location if coming from protected route
   if (session && (location.pathname === "/")) {
+    // Check if user was redirected here from a protected route (preserve original location)
+    const from = (location.state as any)?.from?.pathname
+    if (from) {
+      return <Navigate to={from} replace />
+    }
     return <Navigate to="/dashboard" replace />
   }
 
