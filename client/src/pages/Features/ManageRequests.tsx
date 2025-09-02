@@ -20,6 +20,8 @@ export default function ManageRequests() {
   const [requests, setRequests] = useState<LeaveRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [updatingStatus, setUpdatingStatus] = useState<LeaveStatus | null>(null)
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -37,6 +39,8 @@ export default function ManageRequests() {
   }, [callApi])
 
   const updateStatus = async (id: string, newStatus: LeaveStatus) => {
+    setUpdatingId(id)
+    setUpdatingStatus(newStatus)
     try {
       await callApi(`/leave/${id}/status`, {
         method: "PATCH",
@@ -47,14 +51,12 @@ export default function ManageRequests() {
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       )
 
-      if (newStatus === "approved") {
-        alert("✅ Leave approved. Added to Google Calendar if connected.")
-      } else {
-        alert("❌ Leave rejected.")
-      }
     } catch (err) {
       console.error("Failed to update status", err)
       setError("Could not update request status.")
+    } finally {
+      setUpdatingId(null)
+      setUpdatingStatus(null)
     }
   }
 
@@ -253,17 +255,37 @@ export default function ManageRequests() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => updateStatus(r.id, "approved")}
-                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                          disabled={updatingId === r.id}
+                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          <CheckCircle className="w-3 h-3 mr-1" />
-                          Approve
+                          {updatingId === r.id && updatingStatus === "approved" ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-700 mr-1"></div>
+                              Approving...
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Approve
+                            </>
+                          )}
                         </button>
                         <button
                           onClick={() => updateStatus(r.id, "rejected")}
-                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                          disabled={updatingId === r.id}
+                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                          <XCircle className="w-3 h-3 mr-1" />
-                          Reject
+                          {updatingId === r.id && updatingStatus === "rejected" ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-700 mr-1"></div>
+                              Rejecting...
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="w-3 h-3 mr-1" />
+                              Reject
+                            </>
+                          )}
                         </button>
                       </div>
                     </td>

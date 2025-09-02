@@ -26,6 +26,8 @@ export default function Dashboard() {
   const [authUrl, setAuthUrl] = useState<string | null>(null)
   const [loadingCalendar, setLoadingCalendar] = useState(true)
   const [calendarMessage, setCalendarMessage] = useState("")
+  const [disconnecting, setDisconnecting] = useState(false)
+  const [connecting, setConnecting] = useState(false)
 
   // Get the display name
   const displayName =
@@ -100,6 +102,7 @@ export default function Dashboard() {
   }, [])
 
   const handleDisconnect = async () => {
+    setDisconnecting(true)
     try {
       if (!session?.user?.id) {
         setCalendarMessage("Cannot disconnect: missing user ID.")
@@ -120,6 +123,8 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Error disconnecting:", err)
       setCalendarMessage("Failed to disconnect calendar.")
+    } finally {
+      setDisconnecting(false)
     }
   }
 
@@ -237,19 +242,42 @@ export default function Dashboard() {
                 {isConnected ? (
                   <button
                     onClick={handleDisconnect}
-                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+                    disabled={disconnecting}
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <Unlink className="w-4 h-4 mr-2" />
-                    Disconnect Calendar
+                    {disconnecting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700 mr-2"></div>
+                        Disconnecting...
+                      </>
+                    ) : (
+                      <>
+                        <Unlink className="w-4 h-4 mr-2" />
+                        Disconnect Calendar
+                      </>
+                    )}
                   </button>
                 ) : (
                   <button
-                    onClick={() => authUrl && (window.location.href = authUrl)}
-                    disabled={!authUrl}
+                    onClick={async () => {
+                      if (!authUrl) return
+                      setConnecting(true)
+                      window.location.href = authUrl
+                    }}
+                    disabled={!authUrl || connecting}
                     className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Connect Google Calendar
+                    {connecting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Redirecting...
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Connect Google Calendar
+                      </>
+                    )}
                   </button>
                 )}
               </div>

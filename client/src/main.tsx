@@ -13,8 +13,6 @@ import PublicLayout from "./PublicLayout"
 import ProtectedLayout from "./ProtectedLayout"
 
 import Landing from "./pages/Landing/Landing"
-import Login from "./pages/Auth/Login"
-import Signup from "./pages/Auth/Signup"
 
 import Dashboard from "./pages/Features/Dashboard"
 import ApplyLeave from "./pages/Features/ApplyLeave"
@@ -30,8 +28,6 @@ const router = createBrowserRouter(
       {/* Public layout */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<Signup />} />
         <Route path="auth/callback" element={<AuthCallback />} />
       </Route>
 

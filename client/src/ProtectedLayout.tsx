@@ -54,7 +54,7 @@ export default function ProtectedLayout() {
 
   // 🚪 No session → redirect to login, and preserve where user was trying to go
   if (!session) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   // ✅ API helper

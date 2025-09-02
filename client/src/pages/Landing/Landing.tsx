@@ -1,6 +1,6 @@
 import React from 'react';
-import { Calendar, Users, Shield, ArrowRight, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom'; // ✅ Import Link
+import { Calendar, Users, Shield, ArrowRight, Menu, X, CheckCircle, Clock, Zap } from 'lucide-react';
+import { signInWithGoogle } from '../../lib/auth';
 
 const QuickLeave = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -8,98 +8,59 @@ const QuickLeave = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900">
+    <div className="min-h-screen w-full bg-white text-gray-900 antialiased overflow-x-hidden">
       {/* Navigation */}
-      <nav className="relative z-50 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="text-2xl font-bold text-white">QuickLeave</div>
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center">
+              <span className="text-2xl font-bold text-gray-900">QuickLeave</span>
+            </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-gray-300 hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#workflow" className="text-gray-300 hover:text-white transition-colors">
-              Workflow
-            </a>
-            <a href="#about" className="text-gray-300 hover:text-white transition-colors">
-              About
-            </a>
-          </div>
+            {/* Desktop Navigation */}
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-8">
+                <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">Features</a>
+                <a href="#workflow" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">Workflow</a>
+                <a href="#about" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">About</a>
+              </div>
+            </div>
 
-          {/* Desktop Auth Button */}
-          <div className="hidden md:flex items-center">
-            <Link
-              to="/login"
-              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 lg:px-6 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 text-sm lg:text-base whitespace-nowrap cursor-pointer"
-            >
-              Sign In
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button onClick={toggleMenu} className="md:hidden text-white">
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Overlay */}
-        <div
-          className={`md:hidden fixed inset-0 z-40 transition-opacity duration-300 ${
-            isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <div className="absolute inset-0 bg-black/50" onClick={toggleMenu}></div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div
-          className={`md:hidden fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-gray-900/95 backdrop-blur-md border-l border-gray-700 z-50 transform transition-transform duration-300 ease-in-out ${
-            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
-          <div className="p-6">
-            {/* Close Button */}
-            <div className="flex justify-end mb-8">
-              <button onClick={toggleMenu} className="text-white hover:text-gray-300 transition-colors">
-                <X size={24} />
+            {/* Desktop Auth Button */}
+            <div className="hidden md:block">
+              <button
+                onClick={signInWithGoogle}
+                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors cursor-pointer"
+              >
+                Sign In
               </button>
             </div>
 
-            {/* Menu Items */}
-            <div className="space-y-6">
-              <a
-                href="#features"
-                className="block text-gray-300 hover:text-white transition-colors text-lg"
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
                 onClick={toggleMenu}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
               >
-                Features
-              </a>
-              <a
-                href="#workflow"
-                className="block text-gray-300 hover:text-white transition-colors text-lg"
-                onClick={toggleMenu}
-              >
-                Workflow
-              </a>
-              <a
-                href="#about"
-                className="block text-gray-300 hover:text-white transition-colors text-lg"
-                onClick={toggleMenu}
-              >
-                About
-              </a>
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
 
-              {/* Auth Button */}
-              <div className="pt-8 border-t border-gray-700">
-                <Link
-                  to="/login"
-                  className="w-full block text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all text-lg font-medium"
-                  onClick={toggleMenu}
+          {/* Mobile menu */}
+          <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
+              <a href="#features" onClick={toggleMenu} className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+              <a href="#workflow" onClick={toggleMenu} className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 transition-colors">Workflow</a>
+              <a href="#about" onClick={toggleMenu} className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-gray-900 transition-colors">About</a>
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => { toggleMenu(); signInWithGoogle(); }}
+                  className="block w-full text-center px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-md transition-colors cursor-pointer"
                 >
-                  Sign In with Google
-                </Link>
+                  Sign In
+                </button>
               </div>
             </div>
           </div>
@@ -107,92 +68,165 @@ const QuickLeave = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 py-16 sm:py-20 lg:py-28">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Hero Content */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 sm:mb-8 leading-tight">
-            Manage Leaves
-            <br />
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              with Ease
-            </span>
-            <span className="ml-2 sm:ml-4 text-3xl sm:text-4xl lg:text-5xl xl:text-6xl">🚀</span>
-          </h1>
-
-          <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4">
-            Apply, approve, and sync leaves seamlessly. Integrated with Google Calendar and built for teams of all sizes.
-          </p>
-
-          <Link
-            to="/login"
-            className="group inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:from-purple-700 hover:to-pink-700 cursor-pointer transition-all transform hover:scale-105 shadow-2xl"
-          >
-            Get Started
-            <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
-          </Link>
+      <section className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+              Manage team leaves with
+              <span className="block text-gray-600">professional ease</span>
+            </h1>
+            <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-600 leading-8">
+              Streamlined leave management with Google Calendar integration. Built for modern teams who value simplicity and efficiency.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <button
+                onClick={signInWithGoogle}
+                className="inline-flex items-center px-6 py-3 rounded-md text-base font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors cursor-pointer"
+              >
+                Get started
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
-
-        {/* Decorative Elements */}
-        <div className="absolute top-20 left-4 sm:left-10 w-48 sm:w-72 h-48 sm:h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-4 sm:right-10 w-64 sm:w-96 h-64 sm:h-96 bg-pink-500/10 rounded-full blur-3xl"></div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="relative px-4 sm:px-6 py-16 sm:py-20 lg:py-28">
-        <div className="mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-              Core Features
+      <section id="features" className="py-16 lg:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Everything you need to manage leaves
             </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+              Built with modern teams in mind, our platform streamlines the entire leave management process.
+            </p>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
             {/* Feature 1 */}
-            <div className="group bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-gray-700/50 hover:border-purple-500/50 transition-all hover:transform hover:scale-105">
-              <div className="mb-6">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Calendar className="text-white" size={24} />
-                </div>
+            <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-lg mb-6">
+                <Calendar className="h-6 w-6 text-gray-600" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">Google Calendar Sync</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Auto-create leave events on approval with the right format and easy removal support.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Google Calendar Sync</h3>
+              <p className="text-gray-600">Automatically create calendar events for approved leaves. Keep your team's schedule synchronized and transparent.</p>
             </div>
 
             {/* Feature 2 */}
-            <div className="group bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-gray-700/50 hover:border-purple-500/50 transition-all hover:transform hover:scale-105">
-              <div className="mb-6">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Users className="text-white" size={24} />
-                </div>
+            <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-lg mb-6">
+                <Users className="h-6 w-6 text-gray-600" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">Approval Workflow</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Team members apply, managers approve/reject, and notifications are instantly sent.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Approval Workflow</h3>
+              <p className="text-gray-600">Streamlined approval process with instant notifications. Managers can quickly review and approve requests.</p>
             </div>
 
             {/* Feature 3 */}
-            <div className="group bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-gray-700/50 hover:border-purple-500/50 transition-all hover:transform hover:scale-105">
-              <div className="mb-6">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Shield className="text-white" size={24} />
-                </div>
+            <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-lg mb-6">
+                <Shield className="h-6 w-6 text-gray-600" />
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">Secure Google SSO</h3>
-              <p className="text-gray-400 leading-relaxed text-sm sm:text-base">
-                Sign in easily and securely with Google OAuth for seamless team onboarding.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Secure Authentication</h3>
+              <p className="text-gray-600">Enterprise-grade security with Google SSO. No additional passwords to remember or manage.</p>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Background Elements */}
-        <div className="absolute top-0 left-1/4 w-48 sm:w-64 h-48 sm:h-64 bg-purple-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-56 sm:w-80 h-56 sm:h-80 bg-pink-500/5 rounded-full blur-3xl"></div>
+      {/* Workflow Section */}
+      <section id="workflow" className="py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Simple workflow, powerful results
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+              Our streamlined process makes leave management effortless for everyone involved.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+            {/* Step 1 */}
+            <div className="relative text-center">
+              <div className="flex items-center justify-center w-16 h-16 bg-gray-900 rounded-full mb-6 mx-auto">
+                <span className="text-xl font-bold text-white">1</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Apply for Leave</h3>
+              <p className="text-gray-600">Submit your leave request with dates, reason, and type. Quick and intuitive form submission.</p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative text-center">
+              <div className="flex items-center justify-center w-16 h-16 bg-gray-900 rounded-full mb-6 mx-auto">
+                <span className="text-xl font-bold text-white">2</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Manager Review</h3>
+              <p className="text-gray-600">Your manager receives instant notification and can approve or reject with optional feedback.</p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative text-center">
+              <div className="flex items-center justify-center w-16 h-16 bg-gray-900 rounded-full mb-6 mx-auto">
+                <span className="text-xl font-bold text-white">3</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">Auto Calendar Sync</h3>
+              <p className="text-gray-600">Approved leaves automatically appear in Google Calendar, keeping everyone informed.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats/Benefits Section */}
+      <section className="py-16 lg:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="text-center">
+              <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg mb-4 mx-auto">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Instant Approvals</h3>
+              <p className="text-gray-600">Reduce approval time from days to minutes with our streamlined workflow.</p>
+            </div>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 mx-auto">
+                <Clock className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Real-time Updates</h3>
+              <p className="text-gray-600">Stay informed with instant notifications and status updates for all requests.</p>
+            </div>
+
+            <div className="text-center md:col-span-2 lg:col-span-1">
+              <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg mb-4 mx-auto">
+                <Zap className="h-6 w-6 text-purple-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Zero Setup</h3>
+              <p className="text-gray-600">Get started immediately with Google SSO. No complex configuration required.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section id="about" className="py-16 lg:py-20">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Ready to streamline your leave management?
+          </h2>
+          <p className="mt-6 text-xl text-gray-600 leading-8">
+            Join teams who've simplified their leave process with QuickLeave. Professional, secure, and effortless.
+          </p>
+          <div className="mt-10">
+            <button
+              onClick={signInWithGoogle}
+              className="inline-flex items-center px-8 py-4 rounded-md text-lg font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors cursor-pointer"
+            >
+              Start managing leaves today
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </button>
+          </div>
+        </div>
       </section>
     </div>
   );

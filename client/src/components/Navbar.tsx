@@ -33,7 +33,7 @@ export default function Navbar({ onMenuToggle, isMobileMenuOpen }: NavbarProps) 
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setSession(null)
-    navigate("/login", { replace: true })
+    navigate("/", { replace: true })
   }
 
   return (
@@ -57,9 +57,9 @@ export default function Navbar({ onMenuToggle, isMobileMenuOpen }: NavbarProps) 
         <div className="flex-1 md:flex-none" />
 
         {/* Right side - User */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="flex items-center space-x-4 sm:space-x-4">
           {/* User Menu */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="flex items-center space-x-4 sm:space-x-3">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-gray-900">{displayName}</p>
               <p className="text-xs text-gray-500">{user?.email}</p>
@@ -87,10 +87,10 @@ export default function Navbar({ onMenuToggle, isMobileMenuOpen }: NavbarProps) 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="inline-flex items-center px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors group"
+              className="inline-flex items-center justify-center px-3 py-2 sm:px-3 sm:py-2 text-sm sm:text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors group"
             >
-              <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 text-gray-500 group-hover:text-gray-700" />
-              <span className="hidden sm:inline">Logout</span>
+              <LogOut className="h-4 w-4 sm:h-4 sm:w-4 text-gray-500 group-hover:text-gray-700" />
+              <span className="hidden sm:inline ml-2">Logout</span>
             </button>
           </div>
         </div>

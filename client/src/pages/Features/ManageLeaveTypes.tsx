@@ -59,8 +59,6 @@ export default function ManageLeaveTypes() {
 
   // delete leave type
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this leave type?")) return
-    
     setDeletingId(id)
     setError(null)
     

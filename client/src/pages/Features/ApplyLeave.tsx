@@ -14,9 +14,9 @@ export default function ApplyLeave() {
   const [reason, setReason] = useState("")
   const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([])
   const [leaveTypeId, setLeaveTypeId] = useState<string>("")
-  const [message, setMessage] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  // inline message UI replaced by top toast
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Fetch leave types on mount
   useEffect(() => {
@@ -31,7 +31,8 @@ export default function ApplyLeave() {
         }
       } catch (err) {
         console.error("Failed to load leave types", err)
-        setError("Could not load leave types.")
+        setToast({ type: 'error', text: 'Could not load leave types.' })
+        setTimeout(() => setToast(null), 3500)
       }
     }
     fetchLeaveTypes()
@@ -39,8 +40,7 @@ export default function ApplyLeave() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setMessage(null)
-    setError(null)
+    setToast(null)
     setIsSubmitting(true)
 
     try {
@@ -53,14 +53,18 @@ export default function ApplyLeave() {
           leave_type_id: leaveTypeId,
         }),
       })
-      setMessage("Leave request submitted successfully!")
+      // success toast
+      setToast({ type: 'success', text: 'Leave request submitted successfully!' })
+      setTimeout(() => setToast(null), 3500)
+      setToast({ type: 'success', text: 'Leave request submitted successfully!' })
       setStartDate("")
       setEndDate("")
       setReason("")
       if (leaveTypes.length > 0) setLeaveTypeId(leaveTypes[0].id) // reset to first
     } catch (err) {
       console.error("Failed to apply leave", err)
-      setError("Failed to apply for leave.")
+      setToast({ type: 'error', text: 'Failed to apply for leave.' })
+      setTimeout(() => setToast(null), 3500)
     } finally {
       setIsSubmitting(false)
     }
@@ -79,6 +83,15 @@ export default function ApplyLeave() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Toast */}
+      <div className="fixed top-4 inset-x-0 flex justify-center pointer-events-none z-50">
+        {toast && (
+          <div className={`pointer-events-auto px-4 py-3 rounded-lg shadow border text-sm flex items-center gap-2 ${toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+            {toast.type === 'success' ? <CheckCircle className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+            <span>{toast.text}</span>
+          </div>
+        )}
+      </div>
       <div className="p-4 sm:p-6 w-full max-w-none mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-2">
@@ -278,29 +291,7 @@ export default function ApplyLeave() {
         </div>
 
         {/* Status Messages */}
-        {message && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center space-x-3">
-              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-green-800">Success!</p>
-                <p className="text-sm text-green-700">{message}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center space-x-3">
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-red-800">Error</p>
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Inline messages removed in favor of toast */}
       </div>
     </div>
   )

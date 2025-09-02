@@ -7,7 +7,7 @@ export default function PublicLayout() {
 
   // If user is already authenticated and trying to access login/signup, redirect to dashboard
   // But allow auth callback to proceed
-  if (session && (location.pathname === "/login" || location.pathname === "/signup")) {
+  if (session && (location.pathname === "/")) {
     return <Navigate to="/dashboard" replace />
   }
 

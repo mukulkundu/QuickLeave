@@ -15,7 +15,7 @@ export default function AuthCallback() {
         const error = url.searchParams.get("error")
 
         if (error) {
-          setTimeout(() => navigate("/login"), 1000)
+          setTimeout(() => navigate("/"), 1000)
           return
         }
 
@@ -24,7 +24,7 @@ export default function AuthCallback() {
             await supabase.auth.exchangeCodeForSession(window.location.href)
 
           if (exchangeError) {
-            setTimeout(() => navigate("/login"), 1000)
+            setTimeout(() => navigate("/"), 1000)
             return
           }
 
@@ -42,11 +42,11 @@ export default function AuthCallback() {
             navigate(from, { replace: true })
             return
           } else {
-            setTimeout(() => navigate("/login"), 1000)
+            setTimeout(() => navigate("/"), 1000)
           }
         }
       } catch {
-        setTimeout(() => navigate("/login"), 1000)
+        setTimeout(() => navigate("/"), 1000)
       }
     }
 

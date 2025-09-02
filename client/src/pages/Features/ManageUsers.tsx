@@ -15,6 +15,8 @@ export default function ManageUsers() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updatingEmail, setUpdatingEmail] = useState<string | null>(null)
+  const [targetRole, setTargetRole] = useState<Role | null>(null)
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -32,6 +34,8 @@ export default function ManageUsers() {
   }, [callApi])
 
   const updateRole = async (email: string, newRole: Role) => {
+    setUpdatingEmail(email)
+    setTargetRole(newRole)
     try {
       await callApi("/admin/update-role", {
         method: "POST",
@@ -41,6 +45,9 @@ export default function ManageUsers() {
     } catch (err) {
       console.error("Failed to update role", err)
       setError("Failed to update role.")
+    } finally {
+      setUpdatingEmail(null)
+      setTargetRole(null)
     }
   }
 
@@ -251,19 +258,39 @@ export default function ManageUsers() {
                         {u.role === "member" && (
                           <button
                             onClick={() => updateRole(u.email, "manager")}
-                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                            disabled={updatingEmail === u.email}
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
-                            <UserCheck className="w-3 h-3 mr-1" />
-                            Make Manager
+                            {updatingEmail === u.email && targetRole === "manager" ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-700 mr-1"></div>
+                                Making...
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="w-3 h-3 mr-1" />
+                                Make Manager
+                              </>
+                            )}
                           </button>
                         )}
                         {u.role === "manager" && (
                           <button
                             onClick={() => updateRole(u.email, "member")}
-                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors"
+                            disabled={updatingEmail === u.email}
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
-                            <UserX className="w-3 h-3 mr-1" />
-                            Remove Manager
+                            {updatingEmail === u.email && targetRole === "member" ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-orange-700 mr-1"></div>
+                                Removing...
+                              </>
+                            ) : (
+                              <>
+                                <UserX className="w-3 h-3 mr-1" />
+                                Remove Manager
+                              </>
+                            )}
                           </button>
                         )}
                         {u.role === "admin" && (

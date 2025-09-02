@@ -235,7 +235,7 @@ export const updateLeaveStatus = async (req: Request, res: Response) => {
       }
     } else {
       console.log(
-        `📅 User ${data.user_id} has not connected Google Calendar. Skipping...`
+        // `📅 User ${data.user_id} has not connected Google Calendar. Skipping...`
       );
     }
   } catch (err: any) {
