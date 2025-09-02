@@ -16,19 +16,35 @@ interface LeaveEmailData {
   leaveType: string;
   startDate: string;
   endDate: string;
-  status: "approved" | "rejected";
+  status: "approved" | "rejected" | "cancelled";
 }
 
 export async function sendLeaveStatusEmail(data: LeaveEmailData) {
-  const subject = `Leave Request ${data.status.toUpperCase()}`;
-  const text = `Hi ${data.name || "Employee"},
+  const isCancellation = data.status === "cancelled";
+  const subject = isCancellation
+    ? "Leave Cancelled"
+    : `Leave Request ${data.status.toUpperCase()}`;
+  const text = isCancellation
+    ? `Hi ${data.name || "Employee"},
+
+Your leave is cancelled successfully.
+
+Regards,
+Leave Management System`
+    : `Hi ${data.name || "Employee"},
 
 Your ${data.leaveType} leave request from ${data.startDate} to ${data.endDate} has been ${data.status}.
 
 Regards,
 Leave Management System`;
 
-  const html = `
+  const html = isCancellation
+    ? `
+    <p>Hi <b>${data.name || "Employee"}</b>,</p>
+    <p>Your leave is <b>cancelled</b> successfully.</p>
+    <p>Regards,<br/>Leave Management System</p>
+  `
+    : `
     <p>Hi <b>${data.name || "Employee"}</b>,</p>
     <p>Your <b>${data.leaveType}</b> leave request from 
     <b>${data.startDate}</b> to <b>${data.endDate}</b> 

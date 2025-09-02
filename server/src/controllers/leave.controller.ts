@@ -131,10 +131,50 @@ export const getAllLeaveRequests = async (_req: Request, res: Response) => {
 // --------------------------------------------------
 export const updateLeaveStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status } = req.body as { status: "approved" | "rejected" | "cancelled" };
+  const requester = (req as any).user;
 
-  if (!["approved", "rejected"].includes(status)) {
+  if (!["approved", "rejected", "cancelled"].includes(status)) {
     return res.status(400).json({ error: "Invalid status" });
+  }
+
+  // Fetch leave first to check ownership and populate related data
+  const { data: existing, error: fetchError } = await supabase
+    .from("leave_requests")
+    .select(
+      `
+      id, start_date, end_date, reason, status, user_id,
+      users:user_id (name, email),
+      leave_types:leave_type_id (name)
+    `
+    )
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !existing) {
+    return res.status(404).json({ error: "Leave request not found" });
+  }
+
+  // Load requester's role for authorization
+  const { data: roleRow } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", requester.id)
+    .single();
+
+  const requesterRole = roleRow?.role as string | undefined;
+
+  // Authorization rules:
+  // - approved/rejected: manager or admin only
+  // - cancelled: only the owner of the leave (member/any role if owner)
+  const isManagerOrAdmin = ["manager", "admin"].includes(requesterRole || "");
+  const isOwner = requester?.id === existing.user_id;
+
+  if ((status === "approved" || status === "rejected") && !isManagerOrAdmin) {
+    return res.status(403).json({ error: "Not authorized to update this status" });
+  }
+  if (status === "cancelled" && !isOwner) {
+    return res.status(403).json({ error: "Only the requester can cancel this leave" });
   }
 
   const { data, error } = await supabase
@@ -187,7 +227,7 @@ export const updateLeaveStatus = async (req: Request, res: Response) => {
           userEmail: user?.email,
           userName: user?.name,
         });
-      } else if (status === "rejected") {
+      } else if (status === "rejected" || status === "cancelled") {
         await removeLeaveFromCalendar({
           userId: data.user_id,
           leaveRequestId: data.id,

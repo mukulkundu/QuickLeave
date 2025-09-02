@@ -47,13 +47,15 @@ router.get(
 );
 
 /**
- * Manager/Admin approve/reject
+ * Update leave status
  * PATCH /leave/:id/status
+ * - manager/admin: approve/reject
+ * - member (owner): cancel
  */
 router.patch(
   "/:id/status",
   requireAuth,
-  requireRole(["manager", "admin"]),
+  requireRole(["member", "manager", "admin"]),
   updateLeaveStatus
 );
 
