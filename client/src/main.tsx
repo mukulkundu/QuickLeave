@@ -21,6 +21,8 @@ import ManageRequests from "./pages/Features/ManageRequests"
 import ManageUsers from "./pages/Features/ManageUsers"
 import AuthCallback from "./pages/Auth/AuthCallback";
 import ManageLeaveTypes from "./pages/Features/ManageLeaveTypes";
+import PrivacyPolicy from "./pages/Legal/PrivacyPolicy";
+import TermsOfService from "./pages/Legal/TermsOfService";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +31,8 @@ const router = createBrowserRouter(
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
         <Route path="auth/callback" element={<AuthCallback />} />
+        <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="terms-of-service" element={<TermsOfService />} />
       </Route>
 
       {/* Protected layout */}
