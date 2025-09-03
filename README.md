@@ -50,6 +50,7 @@ Client (`client/.env` or `.env.local`):
 ```
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_BACKEND_URI=your_backend_url
 ```
 
 ### 3) Database schema (Supabase)
